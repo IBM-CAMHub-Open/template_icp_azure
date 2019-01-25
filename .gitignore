@@ -1,0 +1,24 @@
+#  Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# .tfvars files
+*.tfvars
+
+# generated key files
+*.pem
+
+#Test assets
+Rakefile
+.rubocop.yml
+tasks/
+pattern-build/
+**/amazon/terraform/logs/
+**/ibmcloud/terraform/logs/
+**/vmware/terraform/logs/
+cookbook_metadata.json
+components.json
+vmware/terraform/main.tfvars.gitignore
