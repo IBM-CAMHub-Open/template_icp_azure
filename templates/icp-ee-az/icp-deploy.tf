@@ -9,6 +9,9 @@ data "azurerm_client_config" "client_config" {}
 
 locals {
 
+  docker_username = "${var.registry_username != "" ? var.registry_username : var.admin_username}"
+  docker_password = "${var.registry_password != "" ? var.registry_password : "${local.icppassword}"}"
+
   # Intermediate interpolations
   credentials = "${var.registry_username != "" ? join(":", list("${var.registry_username}"), list("${var.registry_password}")) : ""}"
   cred_reg   = "${local.credentials != "" ? join("@", list("${local.credentials}"), list("${var.private_registry}")) : ""}"
@@ -62,8 +65,8 @@ module "icpprovision" {
     "private_registry_enabled"  = "${var.private_registry != "" ? "true" : "false"}"
     # "private_registry_server"   = "${var.private_registry}"
     "image_repo"                = "${var.private_registry != "" ? "${var.private_registry}/${dirname(var.icp_inception_image)}" : ""}"
-    "docker_username"           = "${var.registry_username}"
-    "docker_password"           = "${var.registry_password}"
+    "docker_username"           = "${local.docker_username}"
+    "docker_password"           = "${local.docker_password}"
 
     # An admin password will be generated if not supplied in terraform.tfvars
     "default_admin_password"          = "${local.icppassword}"

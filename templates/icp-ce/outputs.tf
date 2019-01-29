@@ -16,7 +16,7 @@ output "cloudctl" {
 }
 
 output "ibm_cloud_private_cluster_name" {
-  value = "${var.instance_name}-${random_id.clusterid.hex}"
+  value = "${var.cluster_name}"
 }
 
 output "ibm_cloud_private_admin_user" {
@@ -32,7 +32,7 @@ output "ibm_cloud_private_boot_ip" {
 }
 
 output "ibm_cloud_private_master_ip" {
-  value = "${element(azurerm_public_ip.master_pip.*.ip_address, 0)}"
+  value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
 }
 
 output "ibm_cloud_private_proxy_ip" {

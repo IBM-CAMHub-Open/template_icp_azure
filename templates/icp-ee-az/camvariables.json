@@ -574,9 +574,9 @@
     {
       "name": "ibm_cloud_private_master_ip",
       "type": "string",
-      "description": "IBM Cloud Private Cluster Master Node IP.",
+      "description": "IBM Cloud Private Registry.",
       "hidden": false,
-      "label": "Master IP",
+      "label": "IBM Cloud Private Registry",
       "group_name": "content_template_output",
       "secured": false,
       "system": false,
@@ -617,7 +617,7 @@
       "hidden": false,
       "immutable": false,
       "group_name": "content_template_output"
-    },    
+    },        
     {
       "name": "ibm_cloud_private_admin_user",
       "description": "IBM Cloud Private Admin Username",
