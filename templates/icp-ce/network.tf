@@ -46,7 +46,7 @@ resource "azurerm_public_ip" "bootnode_pip" {
   name                         = "${var.boot["name"]}-pip-${count.index}"
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.icp.name}"
-  public_ip_address_allocation = "Static"
+  allocation_method = "Static"
   sku                          = "Standard"
   domain_name_label            = "bootnode-${random_id.clusterid.hex}"
 }
@@ -56,7 +56,7 @@ resource "azurerm_public_ip" "master_pip" {
   name                         = "${var.master["name"]}-pip-${count.index}"
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.icp.name}"
-  public_ip_address_allocation = "Static"
+  allocation_method = "Static"
   sku                          = "Standard"
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}"
 }
@@ -66,7 +66,7 @@ resource "azurerm_public_ip" "proxy_pip" {
   name                         = "${var.proxy["name"]}-pip-${count.index}"
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.icp.name}"
-  public_ip_address_allocation = "Static"
+  allocation_method = "Static"
   sku                          = "Standard"
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-ingress"
 }

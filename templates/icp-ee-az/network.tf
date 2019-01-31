@@ -42,7 +42,7 @@ resource "azurerm_public_ip" "master_pip" {
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.icp.name}"
   sku                          = "Standard"
-  public_ip_address_allocation = "Static"
+  allocation_method = "Static"
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-control"
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_public_ip" "bootnode_pip" {
   location                     = "${var.location}"
   resource_group_name          = "${azurerm_resource_group.icp.name}"
   sku                          = "Standard"
-  public_ip_address_allocation = "Static"
+  allocation_method = "Static"
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-bootnode"
 }
 

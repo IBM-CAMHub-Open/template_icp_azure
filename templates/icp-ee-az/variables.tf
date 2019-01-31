@@ -201,7 +201,7 @@ variable "va" {
 variable "master_lb_ports" {
   description = "Ports on the master load balancer to listen to"
   type        = "list"
-  default     = ["8443", "8001", "8500", "8600", "4300", "9443"]
+  default     = ["8443", "8001", "8500", "8600", "4300", "9443", "22"]
 }
 
 variable "proxy_lb_ports" {
