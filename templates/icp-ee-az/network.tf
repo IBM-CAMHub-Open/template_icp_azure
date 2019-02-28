@@ -46,6 +46,15 @@ resource "azurerm_public_ip" "master_pip" {
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-control"
 }
 
+resource "azurerm_public_ip" "proxy_pip" {
+  name                         = "${var.cluster_name}-${random_id.clusterid.hex}-ingress"
+  location                     = "${var.location}"
+  resource_group_name          = "${azurerm_resource_group.icp.name}"
+  allocation_method = "Static"
+  sku                          = "Standard"
+  domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-ingress"
+}
+
 resource "azurerm_public_ip" "bootnode_pip" {
   name                         = "${var.cluster_name}-${random_id.clusterid.hex}-bootnode"
   location                     = "${var.location}"
@@ -96,7 +105,7 @@ resource "azurerm_network_interface" "proxy_nic" {
   enable_ip_forwarding      = "true"
 
   ip_configuration {
-    name                          = "primary"
+    name                          = "ProxyIPAddress"
     subnet_id                     = "${azurerm_subnet.subnet.id}"
     private_ip_address_allocation = "Dynamic"
   }
@@ -106,7 +115,7 @@ resource "azurerm_network_interface" "management_nic" {
   name                = "${var.management["name"]}-nic-${count.index}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.icp.name}"
-  network_security_group_id = "${azurerm_network_security_group.master_sg.id}"
+  network_security_group_id = "${azurerm_network_security_group.worker_sg.id}"
   enable_ip_forwarding      = "true"
 
   ip_configuration {
@@ -135,7 +144,7 @@ resource "azurerm_network_interface" "va_nic" {
   name                = "${var.va["name"]}-nic-${count.index}"
   location            = "${var.location}"
   resource_group_name = "${azurerm_resource_group.icp.name}"
-  network_security_group_id = "${azurerm_network_security_group.master_sg.id}"
+  network_security_group_id = "${azurerm_network_security_group.worker_sg.id}"
   enable_ip_forwarding      = "true"
 
   ip_configuration {

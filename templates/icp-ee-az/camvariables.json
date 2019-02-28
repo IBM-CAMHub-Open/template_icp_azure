@@ -297,6 +297,18 @@
     },
 
     {
+      "name": "zones",
+      "description": "How many zones to deploy to within the region. If this is less than 3 availability will be limited",
+      "default": "3",
+      "type": "string",
+      "required": true,
+      "secured": false,
+      "label": "Zones",
+      "hidden": false,
+      "immutable": false,
+      "group_name": "generalvmtemplatenet"
+    },
+    {
       "name": "virtual_network_name",
       "description": "The name for the Azure virtual network.",
       "default": "icp_vnet",
@@ -405,7 +417,7 @@
     {
       "name": "worker",
       "default": {
-        "nodes": "3",
+        "nodes": "1",
         "name" : "worker",
         "vm_size" : "Standard_A4_v2",
     	"os_disk_size"  : "150",                       

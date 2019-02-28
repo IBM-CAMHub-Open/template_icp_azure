@@ -9,7 +9,7 @@ data "azurerm_client_config" "client_config" {}
 
 locals {
 
-  docker_username = "${var.registry_username != "" ? var.registry_username : var.admin_username}"
+  docker_username = "${var.registry_username != "" ? var.registry_username : "admin"}"
   docker_password = "${var.registry_password != "" ? var.registry_password : "${local.icppassword}"}"
 
   # Intermediate interpolations
@@ -50,7 +50,7 @@ module "icpprovision" {
   # Workaround for terraform issue #10857
   # When this is fixed, we can work this out automatically
 
-  cluster_size  = "${var.boot["nodes"] + var.master["nodes"] + var.worker["nodes"] + var.proxy["nodes"] + var.management["nodes"] + var.va["nodes"]}"
+  cluster_size  = "${var.boot["nodes"] + var.master["nodes"] + var.worker["nodes"] + var.proxy["nodes"] + var.management["nodes"] + var.va["nodes"] }"
 
   icp_configuration = {
     "network_cidr"              = "${var.network_cidr}"
@@ -58,7 +58,7 @@ module "icpprovision" {
     "ansible_user"              = "${var.admin_username}"
     "ansible_become"            = "true"
     "cluster_lb_address"        = "${azurerm_public_ip.master_pip.fqdn}"
-    "proxy_lb_address"          = "${azurerm_public_ip.master_pip.fqdn}"
+    "proxy_lb_address"          = "${azurerm_public_ip.proxy_pip.fqdn}"
     "cluster_CA_domain"         = "${azurerm_public_ip.master_pip.fqdn}"
     "cluster_name"              = "${var.cluster_name}"
 
@@ -75,10 +75,9 @@ module "icpprovision" {
     "management_services"             = "${local.disabled_management_services}"
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
-    "kubelet_nodename"          = "nodename"
+    "kubelet_nodename"          = "fqdn"
 
-	#"cloud_provider" = "${local.is_311 == "true" ? "" : "azure"}"
-    "cloud_provider"            = "azure"
+    #"cloud_provider"            = "azure"
 
     # If you want to use calico in policy only mode and Azure routed routes.
     "kube_controller_manager_extra_args" = ["--allocate-node-cidrs=true"]

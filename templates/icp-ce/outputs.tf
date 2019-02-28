@@ -20,7 +20,7 @@ output "ibm_cloud_private_cluster_name" {
 }
 
 output "ibm_cloud_private_cluster_CA_domain_name" {
-  value = "${azurerm_public_ip.master_pip.fqdn}"
+  value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
 }
 
 output "ibm_cloud_private_admin_user" {

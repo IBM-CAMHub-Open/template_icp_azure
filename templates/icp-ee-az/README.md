@@ -9,9 +9,6 @@ Limitations
 
 ## Using the Terraform templates
 
-1. git clone the repository
-
-2. Create a [terraform.tfvars](https://www.terraform.io/intro/getting-started/variables.html#from-a-file) file to reflect your environment. Please see [variables.tf](variables.tf) and below tables for variable names and descriptions.
 
 | variable           | default       |required| description                            |
 |--------------------|---------------|--------|----------------------------------------|
@@ -39,7 +36,7 @@ Limitations
 |cluster_ip_range    |10.1.0.0/24    |No      |ICP Service Cluster IP Range            |
 |network_cidr        |10.0.128.0/17    |No      |ICP Network CIDR                        |
 |instance_name       |icp            |No      |Name of the deployment. Will be added to virtual machine names|
-|icpadmin_password   |admin          |No      |ICP admin password                      |
+|icpadmin_password   |          |No      |ICP admin password. If none provided, one will be generated |
 
 
 
@@ -50,30 +47,13 @@ Kubernetes adds support for Azure Availability Zones in version 1.12, as an alph
 Read more about it [here](https://github.com/kubernetes/cloud-provider-azure/blob/master/docs/using-availability-zones.md)
 ICP 3.1.1 includes Kubernetes 1.11 in which the Azure Cloud Provider is not Zone aware. This means that features such as Dynamic PV provisioning should not be used with this template.
 
-Here is an example terraform.tfvars file:
-
-Simple terraform.tfvars to allow connectivity with existing ssh keypair.
-```
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAmGOJtZF5FYrpmEBI9GBcbcr4577pZ90lLxZ7tpvfbPmgXQVGoolChAY165frlotd+o7WORtjPiUlRnr/+676xeYCZngLh46EJislXXvcmZrIn3eeQTRdOlIkiP3V4+LiR9WvpyvmMY9jJ05sTGgk39h9LKhBs+XgU7eZMXGYNU7jDiCZssslTvV1i7SensNqy5bziQbhFKsC7TFRld9leYPgCPtoiSeFIWoXSFbQQ0Lh1ayPpOPb0C2k4tYgDFNr927cObtShUOY1dGGBZygUVKQRro1LZzq39DhmvmMCawCnnQt6A8jz4PE69jP62gnlBsdXQDvEm/L/LBrO4CBbQ=="
-```
-
-terraform.tfvars enabling SSH password authentication and provisioning 4 worker nodes
-```
-disable_password_authentication = false
-worker = {
-  "nodes" = 4
-}
-```
-
-#### Using the environment
-
 #### Logging in
 When the Terraform deployment is complete, you will see an output similar to this:
 
 ```
 ICP Admin Password = e66bd82cfeb5ad404ff7f62ba0ac83df
 ICP Admin Username = admin
-ICP Boot node = 40.67.221.37
+ICP Boot node = 
 ICP Console URL = https://icpdemo-feb5ad40.westeurope.cloudapp.azure.com:8443
 ICP Kubernetes API URL = https://icpdemo-feb5ad40.westeurope.cloudapp.azure.com:8001
 ```
@@ -124,5 +104,21 @@ After a few minutes the load balancer will be available and you can see the IP a
   $ kubectl get services
   NAME         TYPE           CLUSTER-IP   EXTERNAL-IP      PORT(S)        AGE
   kubernetes   ClusterIP      10.1.0.1     <none>           443/TCP        12h
-  mynginx      LoadBalancer   10.1.0.220   51.145.183.111   80:30432/TCP   2m
+  mynginx      LoadBalancer   10.1.0.220   <ip>   80:30432/TCP   2m
   ```
+
+## Template Output Variables
+
+| Name | Description |
+|------|-------------|
+| ibm_cloud_private_admin_url | IBM Cloud Private Cluster URL |
+| ibm_cloud_private_admin_user | IBM Cloud Private Admin Username |
+| ibm_cloud_private_admin_password | IBM Cloud Private Admin Password |
+| ibm_cloud_private_cluster_name | IBM Cloud Private Cluster name |
+| ibm_cloud_private_cluster_CA_domain_name | IBM Cloud Private CA domain name |
+| ibm_cloud_private_boot_ip | IP of the IBM Cloud Private Boot node |
+| ibm_cloud_private_master_ip | IP of the IBM Cloud Private Master Load Balancer |
+| ibm_cloud_private_ssh_user | SSH user used to access the vms |
+| ibm_cloud_private_ssh_key | SSH key, base64 encoded, used to access the vm using the above ibm_cloud_private_ssh_user |
+| connection_name | Name of the Connection Data Object created after the instance deployment. Used to access the IBM Cloud Private instance from other deployments |
+  

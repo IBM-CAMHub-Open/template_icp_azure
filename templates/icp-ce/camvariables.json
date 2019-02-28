@@ -222,9 +222,6 @@
       
     {
       "name": "os_image",
-      "default": {
-        "ubuntu-os-cloud": "ubuntu-1604-lts"
-      },
       "options": [
         {
           "value": "ubuntu",

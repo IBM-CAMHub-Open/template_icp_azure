@@ -13,10 +13,6 @@ Note: This template uses the included temporary disk for the VM as the backing d
 
 ## Using the Terraform template
 
-1. git clone the repository
-
-2. Create a [terraform.tfvars](https://www.terraform.io/intro/getting-started/variables.html#from-a-file) file to reflect your environment. Please see [variables.tf](variables.tf) and below tables for variable names and descriptions.
-
 | variable           | default       |required| description                            |
 |--------------------|---------------|--------|----------------------------------------|
 | *Azure account options* | | |
@@ -32,52 +28,35 @@ Note: This template uses the included temporary disk for the VM as the backing d
 |proxy|{'vm_size':'Standard_A4_v2'<br>'nodes':1<br>'name':'proxy'}|No| Proxy node instance configuration |
 |worker |{'vm_size':'Standard_A4_v2'<br>'nodes':3<br>'name':'worker'}|No| Worker node instance configuration |
 |os_image            |ubuntu         |No      |Select from Ubuntu (ubuntu) or RHEL (rhel) for the Operating System|
-|admin_username      |vmadmin        |No      |linux vm administrator user name        |
+|admin_username      |icpdeploy        |No      |linux vm administrator user name        |
 | *Azure network settings*| | |
 |virtual_network_name|vnet           |No      |The name for the virtual network.       |
 |route_table_name    |icp_route      |No      |The name for the route table.           |
 | * ICP Settings * | | | |
 |cluster_name        |myicp          |No      |Deployment name for resources prefix    |
-|ssh_public_key      |               |No      |SSH Public Key to add to authorized_key for admin_username. Required if you disable password authentication |
-|disable_password_authentication|true           |No      |Whether to enable or disable ssh password authentication for the created Azure VMs. Default: true|
-|icp_version         |3.1.0          |No      |ICP Version                             |
+|icp_version         |3.1.1          |No      |ICP Version                             |
 |cluster_ip_range    |10.0.0.1/24    |No      |ICP Service Cluster IP Range            |
 |network_cidr        |10.1.0.0/16    |No      |ICP Network CIDR                        |
 |instance_name       |icp            |No      |Name of the deployment. Will be added to virtual machine names|
-|icpadmin_password   |admin          |No      |ICP admin password                      |
+|icpadmin_password   |          |No      |ICP admin password. One will be genarated if none provided |
 
-
-
-
-Here are some example terraform.tfvars files:
-
-Simple terraform.tfvars to allow connectivity with existing ssh keypair.
-```
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAmGOJtZF5FYrpmEBI9GBcbcr4577pZ90lLxZ7tpvfbPmgXQVGoolChAY165frlotd+o7WORtjPiUlRnr/+676xeYCZngLh46EJislXXvcmZrIn3eeQTRdOlIkiP3V4+LiR9WvpyvmMY9jJ05sTGgk39h9LKhBs+XgU7eZMXGYNU7jDiCZssslTvV1i7SensNqy5bziQbhFKsC7TFRld9leYPgCPtoiSeFIWoXSFbQQ0Lh1ayPpOPb0C2k4tYgDFNr927cObtShUOY1dGGBZygUVKQRro1LZzq39DhmvmMCawCnnQt6A8jz4PE69jP62gnlBsdXQDvEm/L/LBrO4CBbQ=="
-```
-
-terraform.tfvars enabling SSH password authentication and provisioning 4 worker nodes
-```
-disable_password_authentication = false
-worker = {
-  "nodes" = 4
-}
-```
-#### Red Hat support
-This automation relies heavily on cloud-init for configuring and preparing the cluster after the VMs have been created.
-Azure has created a cloud-init enabled RHEL image, with the SKU `7-RAW-CI`.
-To simplify the process of doing the installation, you are required to use Ubuntu for the boot node, since Docker-CE is available to install from docker repositories.
-This will bootstrap the cluster installation process and the IBM provided docker package for Red Hat will be installed on the RHEL cluster nodes.
-
-To enable this configuration, add the following to your `terraform.tfvars`
-
-```
-os_image = "rhel"
-boot = {
-  nodes = 1
-}
-```
 
 #### Using the environment
 
 Follow the instructions outlined [here](../../README.md)
+
+## Template Output Variables
+
+| Name | Description |
+|------|-------------|
+| ibm_cloud_private_admin_url | IBM Cloud Private Cluster URL |
+| ibm_cloud_private_admin_user | IBM Cloud Private Admin Username |
+| ibm_cloud_private_admin_password | IBM Cloud Private Admin Password |
+| ibm_cloud_private_cluster_name | IBM Cloud Private Cluster name |
+| ibm_cloud_private_cluster_CA_domain_name | IBM Cloud Private CA domain name |
+| ibm_cloud_private_boot_ip | IP of the IBM Cloud Private Boot node |
+| ibm_cloud_private_master_ip | IP of the IBM Cloud Private Master Load Balancer |
+| ibm_cloud_private_ssh_user | SSH user used to access the vms |
+| ibm_cloud_private_ssh_key | SSH key, base64 encoded, used to access the vm using the above ibm_cloud_private_ssh_user |
+| connection_name | Name of the Connection Data Object created after the instance deployment. Used to access the IBM Cloud Private instance from other deployments |
+

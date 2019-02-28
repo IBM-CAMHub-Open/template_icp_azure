@@ -8,7 +8,6 @@ These Terraform example templates uses the Terraform AzureRM Provider to provisi
 
 
 ## Pre-requisits
-- Working copy of [Terraform](https://www.terraform.io/intro/getting-started/install.html)
 - Basic understanding of [IBM Cloud Private](https://www.ibm.com/cloud/private)
 - Azure account
 - Access to ICP Images tarball if deploying ICP Enterprise Edition templates
@@ -29,18 +28,9 @@ Each template example provided is highly customizable, but are all configured wi
 
     Deploy ICP Enterprise Edition in a highly available configuration, with cluster deployed across 3 Azure availability zones
 
-3. icp-ee-as (comming soon)
 
-    Deploy ICP Enterprise Edition in a highly available configuration, with cluster availability managed using Azure Availability Sets
 
 ## Using the templates
-
-1. Select the appropriate [template](templates/) for your use case
-2. Adjust it as required, or use one of the sample `terraform.tfvars`
-3. Run `terraform init` in the selected template directory
-4. Run `terraform apply`
-
-You will be prompted by the azure provider to login to create a temporary token. To create a permanent service principal which does not time out and require re-authentication, follow these steps outlined in [Terraform docs](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html)
 
 Note: For ICP to work on Azure, the kubernetes controller manager needs to dynamically update the Azure Routing Table. It is therefore essential that the variables `aadClientId` and `aadClientSecret` is populated with a service principal that has permissions to update the azure routing table.
 
@@ -59,7 +49,7 @@ ICP Kubernetes API URL = https://hktestas-f4c95db9-control.westeurope.cloudapp.a
 cloudctl = cloudctl login --skip-ssl-validation -a https://hktestas-f4c95db9-control.westeurope.cloudapp.azure.com:8443 -u admin -p 2f052b35d7cdc3c87b5d6b49009fe972 -n default -c id-myicp-account
 ```
 
-You can use `cloudctl` to configure you local `kubectl` and `helm` command line client to use this environments, and access the Web Console with the provided username and password
+You can use `cloudctl` to configure your local `kubectl` and `helm` command line client to use this environments, and access the Web Console with the provided username and password
 
 For instructions on how to install cloudctl go to the IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.1/manage_cluster/install_cli.html)
 
