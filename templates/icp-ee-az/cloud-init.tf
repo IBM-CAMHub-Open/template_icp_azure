@@ -18,8 +18,37 @@ data "template_file" "common_config" {
       sudo: [ "ALL=(ALL) NOPASSWD:ALL" ]
       shell: /bin/bash
       ssh-authorized-keys:
-        - ${tls_private_key.installkey.public_key_openssh}
+        - ${tls_private_key.vmkey.public_key_openssh}
 EOF
+}
+
+#private registry certificate for boot node
+data "template_file" "boot_cert_config" {
+  template = <<EOF
+#cloud-config
+write_files:
+- encoding: b64
+  content: ${base64encode(file("${path.module}/scripts/copy_certif.sh"))}
+  permissions: '0755'
+  path: /opt/ibm/scripts/copy_certif.sh
+- encoding: b64
+  content: ${base64encode("${tls_private_key.vmkey.private_key_pem}")}
+  permissions: '0600'
+  path: /opt/ibm/scripts/.master_ssh
+- encoding: b64
+  content: ${base64encode("${azurerm_public_ip.master_pip.fqdn}")}
+  permissions: '0755'
+  path: /opt/ibm/scripts/.registry_name
+- encoding: b64
+  content: ${base64encode("${element(concat(azurerm_network_interface.master_nic.*.private_ip_address, list("")), 0)}")}
+  permissions: '0755'
+  path: /opt/ibm/scripts/.master_ip
+- encoding: b64
+  content: ${base64encode("${var.admin_username}")}
+  permissions: '0755'
+  path: /opt/ibm/scripts/.ssh_user
+EOF
+
 }
 
 data "template_file" "docker_disk" {
@@ -177,6 +206,12 @@ data "template_cloudinit_config" "bootconfig" {
   part {
     content_type = "text/cloud-config"
     content      =  "${data.template_file.common_config.rendered}"
+  }
+
+  #icp docker certificate
+  part {
+    content_type = "text/cloud-config"
+    content      =  "${data.template_file.boot_cert_config.rendered}"
   }
 
   # Setup the docker disk

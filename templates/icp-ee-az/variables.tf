@@ -126,7 +126,7 @@ variable "boot" {
   default = {
     nodes         = "1"
     name          = "bootnode"
-    vm_size       = "Standard_A2_v2"
+    vm_size       = "Standard_A8m_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "100"
     docker_disk_size = "100"
@@ -138,7 +138,7 @@ variable "master" {
   default = {
     nodes         = "3"
     name          = "master"
-    vm_size       = "Standard_A8_v2"
+    vm_size       = "Standard_A8m_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "300"
     docker_disk_size = "100"
@@ -154,7 +154,7 @@ variable "proxy" {
   default = {
     nodes         = "3"
     name          = "proxy"
-    vm_size       = "Standard_A2_v2"
+    vm_size       = "Standard_A4_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "150"        
     docker_disk_size = "100"
@@ -166,7 +166,6 @@ variable "management" {
   default = {
     nodes         = "3"
     name          = "mgmt"
-    #vm_size      = "Standard_A4_v2"
     vm_size       = "Standard_A8_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "200"        

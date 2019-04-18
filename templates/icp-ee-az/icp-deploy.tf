@@ -131,13 +131,19 @@ module "icpprovision" {
   generate_key = true
 
   ssh_user         = "${var.admin_username}"
-  ssh_key_base64   = "${base64encode(tls_private_key.installkey.private_key_pem)}"
+  ssh_key_base64   = "${base64encode(tls_private_key.vmkey.private_key_pem)}"
 
     # Make sure to wait for image load to complete
-    hooks = {
-      "boot-preconfig" = [
-        "while [ ! -f /opt/ibm/.imageload_complete ]; do sleep 5; done"
-      ]
-    }
+     hooks = {
+       "cluster-preconfig" = ["echo No hook"]
+       "cluster-postconfig" = ["echo No hook"]
+       "preinstall" = ["echo No hook"]     
+       "boot-preconfig" = [
+       	"while [ ! -f /opt/ibm/.imageload_complete ]; do sleep 5; done"
+       ]
+       "postinstall" = [
+         "/opt/ibm/scripts/copy_certif.sh"
+       ]       
+     }
 
 }

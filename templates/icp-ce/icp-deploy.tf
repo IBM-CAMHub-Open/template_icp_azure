@@ -41,8 +41,8 @@ module "icpprovision" {
     "proxy_lb_address"          = "${element(azurerm_public_ip.proxy_pip.*.fqdn, 0)}"
     "cluster_CA_domain"         = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
     "cluster_name"              = "${var.cluster_name}"
-    #"docker_username"           = "admin"
-    #"docker_password"           = "${local.icppassword}"
+    "docker_username"           = "admin"
+    "docker_password"           = "${local.icppassword}"
 
     # RHEL requires firewall enabled flag
     "firewall_enabled"          = "true"
