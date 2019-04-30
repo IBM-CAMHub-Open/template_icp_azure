@@ -48,6 +48,4 @@ locals {
 
   disabled_management_services = "${zipmap(var.disabled_management_services, slice(local.disabled_list, 0, length(var.disabled_management_services)))}"
 
-  is_311 = "${replace(var.icp_inception_image, "3.1.1", "") != var.icp_inception_image ? "true" : "false"}"
-
 }

@@ -175,27 +175,39 @@ EOF
   }
 }
 
-data "template_file" "master_config" {
+data "template_file" "master_shared_registry" {
   template = <<EOF
-#cloud-config
-write_files:
-- path: /etc/smbcredentials/icpregistry.cred
-  content: |
-    username=$${username}
-    password=$${password}
-mounts:
-- [ ${element(split(":", azurerm_storage_share.icpregistry.url), 1)}, /var/lib/registry, cifs, "nofail,credentials=/etc/smbcredentials/icpregistry.cred,dir_mode=0777,file_mode=0777,serverino" ]
+#!/bin/bash
+if [ ! -d "/etc/smbcredentials" ]; then
+    sudo mkdir /etc/smbcredentials
+fi
+
+if [ ! -d "/var/lib/registry" ]; then
+    sudo mkdir -p /var/lib/registry
+fi
+if [ ! -d "/var/lib/icp/audit" ]; then
+    sudo mkdir -p /var/lib/icp/audit
+fi
+
+if [ ! -f "/etc/smbcredentials/$${account_name}.cred" ]; then
+    sudo bash -c 'echo "username=$${storage_account_name}" >> /etc/smbcredentials/$${account_name}.cred'
+    sudo bash -c 'echo "password=$${password}" >> /etc/smbcredentials/$${account_name}.cred'
+fi
+
+sudo chmod 600 /etc/smbcredentials/$${account_name}.cred
+sudo bash -c 'echo "$${registry_path} /var/lib/registry cifs nofail,vers=3.0,credentials=/etc/smbcredentials/$${account_name}.cred,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
+sudo bash -c 'echo "$${registry_path} /var/lib/icp/audit cifs nofail,vers=3.0,credentials=/etc/smbcredentials/$${account_name}.cred,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab'
+
+sudo mount -a
 
 EOF
 
   vars {
-    username= "${azurerm_storage_account.infrastructure.name}"
+    account_name="${azurerm_storage_share.icpregistry.name}"
+    registry_path="${element(split(":", azurerm_storage_share.icpregistry.url), 1)}"
+    storage_account_name= "${azurerm_storage_account.infrastructure.name}"
     password= "${azurerm_storage_account.infrastructure.primary_access_key}"
-    docker_tarball = "${var.docker_image_location != "" ? "var.docker_image_location" : ""}"    
-    tarball = "${var.image_location}"
-    key     = "${var.image_location_key}"
   }
-    
 }
 
 data "template_cloudinit_config" "bootconfig" {
@@ -259,8 +271,8 @@ data "template_cloudinit_config" "masterconfig" {
 
   # Setup the icp registry share
   part {
-    content_type = "text/cloud-config"
-    content      =  "${data.template_file.master_config.rendered}"
+    content_type = "text/x-shellscript"
+    content      = "${data.template_file.master_shared_registry.rendered}"
   }
 
   # Load the Docker Image
@@ -269,11 +281,6 @@ data "template_cloudinit_config" "masterconfig" {
     content      = "${var.docker_image_location != "" ? data.template_file.docker_load_tarball.rendered : "#!/bin/bash"}"
   }
 
-  # Load the ICP Images
-  part {
-    content_type = "text/x-shellscript"
-    content      = "${data.template_file.load_tarball.rendered}"
-  }
 }
 
 

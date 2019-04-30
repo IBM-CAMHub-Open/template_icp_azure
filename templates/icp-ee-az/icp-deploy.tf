@@ -1,5 +1,5 @@
 ##################################
-## This module handles all the ICP confifguration
+## This module handles all the ICP configuration
 ## and prerequisites setup
 ##################################
 
@@ -75,7 +75,7 @@ module "icpprovision" {
     "management_services"             = "${local.disabled_management_services}"
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
-    "kubelet_nodename"          = "fqdn"
+    "kubelet_nodename"          = "nodename"
 
     #"cloud_provider"            = "azure"
 
