@@ -484,7 +484,7 @@
   {
     "name": "icp_version",
     "description": "IBM Cloud Private Version Number",
-    "default" : "3.1.1",
+    "default" : "3.1.2",
     "type": "string",
     "required": false,
     "secured": false,
@@ -554,7 +554,17 @@
       "hidden": false,
       "immutable": false,
       "group_name": "content_template_output"
-    },   
+    },  
+    {
+      "name": "ibm_cloud_private_registry_server",
+      "description": "IBM Cloud Private Registry Server",
+      "type": "string",
+      "required": true,
+      "secured": false,
+      "label": "ICP Registry Server",
+      "hidden": false,
+      "immutable": false
+	},                                           
     {
       "name": "ibm_cloud_private_cluster_CA_domain_name",
       "description": "IBM Cloud Private Cluster CA Domain Name",
@@ -565,7 +575,17 @@
       "hidden": false,
       "immutable": false,
       "group_name": "content_template_output"
-    },                   
+    },      
+    {
+      "name": "icp_klusterlet_dns",
+      "label": "Host Name for klusterlet Prometheus ingress rule",
+      "description": "Use this host name as input to the klusterlet Prometheus ingress hostname.",
+      "group_name": "",
+      "secured": false,
+      "hidden": false,
+      "shortname": "",
+      "type": "string"
+    },             	                                                       
     {
       "name": "ibm_cloud_private_admin_user",
       "description": "IBM Cloud Private Admin Username",

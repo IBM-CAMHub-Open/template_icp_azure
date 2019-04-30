@@ -172,4 +172,18 @@ resource "azurerm_network_security_group" "boot_sg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  
+  security_rule {
+    name                       = "${var.cluster_name}-${var.master["name"]}-8500"
+    description                = "Allow inbound docker registry from all locations"
+    priority                   = 400
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8500"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  
 }

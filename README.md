@@ -51,7 +51,7 @@ cloudctl = cloudctl login --skip-ssl-validation -a https://hktestas-f4c95db9-con
 
 You can use `cloudctl` to configure your local `kubectl` and `helm` command line client to use this environments, and access the Web Console with the provided username and password
 
-For instructions on how to install cloudctl go to the IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.1/manage_cluster/install_cli.html)
+For instructions on how to install cloudctl go to the IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.2/manage_cluster/install_cli.html)
 
 ## Using integrated Azure functionality
 
@@ -68,7 +68,7 @@ To expose an application with Azure Load balancer, follow these steps
    kubectl run mynginx --image=nginx --replicas=2 --port=80
    ```
    Note: If you get a imagepolicy error you'll need to whitelist images from docker hub
-   See IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.1/manage_images/image_security.html) for information on how to do this
+   See IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.2/manage_images/image_security.html) for information on how to do this
 2. Expose the deployment with type LoadBalancer
     ```
     kubectl expose deployment mynginx --port=80 --type=LoadBalancer
