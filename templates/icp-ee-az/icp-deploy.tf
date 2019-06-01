@@ -19,6 +19,9 @@ module "icpprovision" {
   # Provide IP addresses for boot, master, mgmt, va, proxy and workers
   boot-node = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, list("")), 0)}"
 
+  #in support of workers scaling
+  icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
+  
   icp-host-groups = {
     master      = ["${azurerm_network_interface.master_nic.*.private_ip_address}"]
     worker      = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
@@ -65,9 +68,9 @@ module "icpprovision" {
     "management_services"             = "${local.disabled_management_services}"
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
-    "kubelet_nodename"          = "nodename"
-
-    #"cloud_provider"            = "azure"
+    
+    "kubelet_nodename"          = "fqdn"
+    "cloud_provider"            = "azure"
 
     # If you want to use calico in policy only mode and Azure routed routes.
     "kube_controller_manager_extra_args" = ["--allocate-node-cidrs=true"]
@@ -75,21 +78,35 @@ module "icpprovision" {
 
     # Azure specific configurations
     # We don't need ip in ip with Azure networking
-    "calico_ipip_enabled"       = "false"
+    #"calico_ipip_enabled"       = "false"
     # Settings for patched icp-inception
     "calico_networking_backend"  = "none"
     "calico_ipam_type"           = "host-local"
     "calico_ipam_subnet"         = "usePodCidr"
+    "calico_ipip_mode" 			 = "Always"
+    
     # Try this later: "calico_cluster_type" = "k8s"
     "azure"                  = {
 
-      "cloud_provider_conf" = {
-          "cloud"               = "AzurePublicCloud"
+      "cloud_provider" = {
+          "cloud"               = "AzurePublicCloud"      
           "useInstanceMetadata" = "true"
           "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
           "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
           "resourceGroup"       = "${azurerm_resource_group.icp.name}"
-          "useManagedIdentityExtension" = "true"
+          "useManagedIdentityExtension" = "false"
+          "aadClientId"         = "${var.aadClientId}"
+          "aadClientSecret"     = "${var.aadClientSecret}"
+
+      }
+
+      "cloud_provider_conf" = {
+          "cloud"               = "AzurePublicCloud"      
+          "useInstanceMetadata" = "true"
+          "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
+          "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
+          "resourceGroup"       = "${azurerm_resource_group.icp.name}"
+          "useManagedIdentityExtension" = "false"
       }
 
       "cloud_provider_controller_conf" = {
@@ -106,8 +123,9 @@ module "icpprovision" {
           "vnetResourceGroup"   = "${azurerm_resource_group.icp.name}"
           "routeTableName"      = "${azurerm_route_table.routetb.name}"
           "cloudProviderBackoff"        = "false"
-          "loadBalancerSku"             = "Standard"
-          # "primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
+          "loadBalancerSku"             = "standard"
+          #"primaryAvailabilitySetName"  = "${azurerm_lb.controlplane.id}"
+          #"primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
           "securityGroupName"           = "${azurerm_network_security_group.worker_sg.name}"# "hktest-worker-sg"
           "excludeMasterFromStandardLB" = "true"
           "useManagedIdentityExtension" = "false"

@@ -9,13 +9,16 @@ data "azurerm_client_config" "client_config" {}
 
 module "icpprovision" {
   source = "git::https://github.com/IBM-CAMHub-Open/template_icp_modules.git?ref=2.3//public_cloud"
-
+ 
   bastion_host = "${element(concat(azurerm_public_ip.bootnode_pip.*.ip_address, azurerm_public_ip.master_pip.*.ip_address), 0)}"
 
   # Provide IP addresses for boot, master, mgmt, va, proxy and workers
   boot-node = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, azurerm_network_interface.master_nic.*.private_ip_address), 0)}"
 
   ssh_agent = false
+
+  #in support of workers scaling
+  icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
   
   icp-host-groups = {
     master      = ["${azurerm_network_interface.master_nic.*.private_ip_address}"]
@@ -56,7 +59,7 @@ module "icpprovision" {
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
     "kubelet_nodename"          = "nodename"
-    "cloud_provider"            = "azure"
+    #"cloud_provider"            = "azure"
 
     # If you want to use calico in policy only mode and Azure routed routes.
     "kube_controller_manager_extra_args" = ["--allocate-node-cidrs=true"]

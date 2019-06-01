@@ -3,9 +3,9 @@
 
 data "azurerm_subscription" "subscription" {}
 
-data "azurerm_builtin_role_definition" "builtin_role_definition" {
-  name = "Reader"
-}
+#data "azurerm_builtin_role_definition" "builtin_role_definition" {
+#  name = "Reader"
+#}
 
 # Grant the VM identity contributor rights to the current subscription
 # resource "azurerm_role_assignment" "role_assignment" {
