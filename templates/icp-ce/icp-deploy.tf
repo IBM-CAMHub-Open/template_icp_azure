@@ -17,6 +17,9 @@ module "icpprovision" {
 
   ssh_agent = false
 
+  #in support of version upgrade
+  icp-version-upgrade = "${var.icp_version}"
+  
   #in support of workers scaling
   icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
   
@@ -67,7 +70,8 @@ module "icpprovision" {
 
     # Azure specific configurations
     # We don't need ip in ip with Azure networking
-    "calico_ipip_enabled"       = "false"
+    "calico_ipip_mode" 			 = "Always"    
+    #"calico_ipip_enabled"       = "false"
     "calico_networking_backend" = "none"
     "calico_ipam_type"          = "host-local"
     "calico_ipam_subnet"        = "usePodCidr"

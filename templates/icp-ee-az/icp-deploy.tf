@@ -7,6 +7,28 @@
 # which is used by the azure cloud provider
 data "azurerm_client_config" "client_config" {}
 
+resource "null_resource" "image_copy" {
+
+  triggers {
+    imagelocation = "${var.image_location}"
+  }
+
+  connection {
+
+    host     = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, list("")), 0)}"
+    bastion_host  = "${azurerm_public_ip.bootnode_pip.ip_address}"
+
+    user          = "${var.admin_username}"
+    private_key   = "${tls_private_key.vmkey.private_key_pem}"
+  }  
+  provisioner "remote-exec" {
+
+    # We need to wait for cloud init to finish it's boot sequence.
+    inline = [
+      "if [ -d /opt/ibm/cluster ] && [ ! -z ${var.image_location} ]; then image_file=\"$(basename ${var.image_location})\"; azcopy --source ${var.image_location} --source-key ${var.image_location_key} --destination /tmp/$image_file; fi"
+    ]
+  }  
+}
 
 module "icpprovision" {
   source = "git::https://github.com/IBM-CAMHub-Open/template_icp_modules.git?ref=2.3//public_cloud"
@@ -18,6 +40,10 @@ module "icpprovision" {
 
   # Provide IP addresses for boot, master, mgmt, va, proxy and workers
   boot-node = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, list("")), 0)}"
+
+  #in support of version upgrade
+  icp-version-upgrade = "${var.icp_inception_image}"
+  image-location-upgrade = "${var.image_location}"
 
   #in support of workers scaling
   icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
