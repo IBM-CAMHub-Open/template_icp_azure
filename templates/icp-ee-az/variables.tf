@@ -128,7 +128,7 @@ variable "boot" {
     name          = "bootnode"
     vm_size       = "Standard_A8_v2"
     os_disk_type  = "Standard_LRS"
-    os_disk_size  = "100"
+    os_disk_size  = "200"
     docker_disk_size = "100"
     docker_disk_type = "StandardSSD_LRS"
   }

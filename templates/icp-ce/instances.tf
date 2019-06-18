@@ -50,7 +50,7 @@ EOF
 ##################################
 
 resource "azurerm_availability_set" "workers" {
-  name                = "workers_availabilityset"
+  name                = "workers_availabilityset-${random_id.clusterid.hex}"
   location            = "${azurerm_resource_group.icp.location}"
   resource_group_name = "${azurerm_resource_group.icp.name}"
   managed             = true

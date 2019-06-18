@@ -7,6 +7,20 @@
 # which is used by the azure cloud provider
 data "azurerm_client_config" "client_config" {}
 
+locals {
+
+  docker_username = "${var.registry_username != "" ? var.registry_username : "admin"}"
+  docker_password = "${var.registry_password != "" ? var.registry_password : "${local.icppassword}"}"
+
+  # Intermediate interpolations
+  credentials = "${var.registry_username != "" ? join(":", list("${var.registry_username}"), list("${var.registry_password}")) : ""}"
+  cred_reg   = "${local.credentials != "" ? join("@", list("${local.credentials}"), list("${var.private_registry}")) : ""}"
+
+  # Inception image formatted for ICP deploy module
+  inception_image = "${local.cred_reg != "" ? join("/", list("${local.cred_reg}"), list("${var.icp_inception_image}")) : var.icp_inception_image}"
+
+}
+
 resource "null_resource" "image_copy" {
 
   triggers {
@@ -57,13 +71,9 @@ module "icpprovision" {
     
   }
 
-  icp-version = "${var.icp_inception_image}"
+  icp-version = "${local.inception_image}"
   icp_config_file = "${path.module}/scripts/config.yaml"
-/*
-  registry_username = "${local.docker_username}"
-  registry_password = "${local.docker_password}"
-  registry_server = "${local.registry_server}"
-  */
+
   #image file set if the binaries are loaded from Azure container
   image_file = "${var.image_location != "" ? "/opt/ibm/cluster/images/${basename(var.image_location)}" : "/dev/null" }"
   #docker image file set if the binaries are loaded from Azure container  
@@ -94,9 +104,9 @@ module "icpprovision" {
     "management_services"             = "${local.disabled_management_services}"
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
-    
-    "kubelet_nodename"          = "fqdn"
-    "cloud_provider"            = "azure"
+    "kubelet_nodename"          = "nodename"
+
+    #"cloud_provider"            = "azure"
 
     # If you want to use calico in policy only mode and Azure routed routes.
     "kube_controller_manager_extra_args" = ["--allocate-node-cidrs=true"]
@@ -104,35 +114,21 @@ module "icpprovision" {
 
     # Azure specific configurations
     # We don't need ip in ip with Azure networking
-    #"calico_ipip_enabled"       = "false"
+    "calico_ipip_enabled"       = "false"
     # Settings for patched icp-inception
     "calico_networking_backend"  = "none"
     "calico_ipam_type"           = "host-local"
     "calico_ipam_subnet"         = "usePodCidr"
-    "calico_ipip_mode" 			 = "Always"
-    
     # Try this later: "calico_cluster_type" = "k8s"
     "azure"                  = {
 
-      "cloud_provider" = {
-          "cloud"               = "AzurePublicCloud"      
-          "useInstanceMetadata" = "true"
-          "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
-          "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
-          "resourceGroup"       = "${azurerm_resource_group.icp.name}"
-          "useManagedIdentityExtension" = "false"
-          "aadClientId"         = "${var.aadClientId}"
-          "aadClientSecret"     = "${var.aadClientSecret}"
-
-      }
-
       "cloud_provider_conf" = {
-          "cloud"               = "AzurePublicCloud"      
+          "cloud"               = "AzurePublicCloud"
           "useInstanceMetadata" = "true"
           "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
           "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
           "resourceGroup"       = "${azurerm_resource_group.icp.name}"
-          "useManagedIdentityExtension" = "false"
+          "useManagedIdentityExtension" = "true"
       }
 
       "cloud_provider_controller_conf" = {
@@ -149,9 +145,8 @@ module "icpprovision" {
           "vnetResourceGroup"   = "${azurerm_resource_group.icp.name}"
           "routeTableName"      = "${azurerm_route_table.routetb.name}"
           "cloudProviderBackoff"        = "false"
-          "loadBalancerSku"             = "standard"
-          #"primaryAvailabilitySetName"  = "${azurerm_lb.controlplane.id}"
-          #"primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
+          "loadBalancerSku"             = "Standard"
+          # "primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
           "securityGroupName"           = "${azurerm_network_security_group.worker_sg.name}"# "hktest-worker-sg"
           "excludeMasterFromStandardLB" = "true"
           "useManagedIdentityExtension" = "false"

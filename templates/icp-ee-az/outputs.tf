@@ -60,5 +60,5 @@ output "Filestore for registry and audit" {
 }
 
 output "icp_klusterlet_dns" {
-  value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
+  value = "${azurerm_public_ip.klusterlet_pip.fqdn}"
 }
