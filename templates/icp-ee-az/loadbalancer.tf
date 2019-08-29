@@ -13,7 +13,16 @@ resource "azurerm_lb" "controlplane" {
     public_ip_address_id = "${azurerm_public_ip.master_pip.id}"
   }
 }
-
+/*
+resource "azurerm_lb_probe" "master_lb_probe" {
+  count               = "${length(var.master_lb_ports)}"
+  resource_group_name = "${azurerm_resource_group.icp.name}"
+  loadbalancer_id     = "${azurerm_lb.controlplane.id}"
+  name                = "MasterportProbe${element(var.master_lb_ports, count.index)}"
+  protocol            = "Tcp"  
+  port                = "${element(var.master_lb_ports, count.index)}"
+}
+*/
 # Create a rule per port in var.master_lb_ports
 resource "azurerm_lb_rule" "master_rule" {
   count                          = "${length(var.master_lb_ports)}"
@@ -54,7 +63,16 @@ resource "azurerm_lb" "proxyplane" {
     public_ip_address_id = "${azurerm_public_ip.proxy_pip.id}"
   }
 }
-
+/*
+resource "azurerm_lb_probe" "proxy_lb_probe" {
+  count               = "${length(var.proxy_lb_ports)}"
+  resource_group_name = "${azurerm_resource_group.icp.name}"
+  loadbalancer_id     = "${azurerm_lb.proxyplane.id}"
+  name                = "ProxyportProbe${element(var.proxy_lb_ports, count.index)}"
+  protocol            = "Tcp"  
+  port                = "${element(var.proxy_lb_ports, count.index)}"
+}
+*/
 # Create a rule per port in var.proxy_lb_ports
 resource "azurerm_lb_rule" "proxy_rule" {
   count                          = "${length(var.proxy_lb_ports)}"

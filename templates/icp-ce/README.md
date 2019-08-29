@@ -34,7 +34,7 @@ Note: This template uses the included temporary disk for the VM as the backing d
 |route_table_name    |icp_route      |No      |The name for the route table.           |
 | * ICP Settings * | | | |
 |cluster_name        |myicp          |No      |Deployment name for resources prefix    |
-|icp_version         |3.1.1          |No      |ICP Version                             |
+|icp_version         |3.2.0          |No      |ICP Version                             |
 |cluster_ip_range    |10.0.0.1/24    |No      |ICP Service Cluster IP Range            |
 |network_cidr        |10.1.0.0/16    |No      |ICP Network CIDR                        |
 |instance_name       |icp            |No      |Name of the deployment. Will be added to virtual machine names|

@@ -18,5 +18,7 @@ resource "azurerm_storage_share" "icpregistry" {
 
   resource_group_name  = "${azurerm_resource_group.icp.name}"
   storage_account_name = "${azurerm_storage_account.infrastructure.name}"
+  
+  quota = 100
 
 }

@@ -24,10 +24,6 @@ resource "azurerm_resource_group" "icp" {
 ##################################
 ## Create the SSH key terraform will use for installation
 ##################################
-resource "tls_private_key" "installkey" {
-  algorithm   = "RSA"
-}
-
 resource "tls_private_key" "vmkey" {
   algorithm   = "RSA"
 }
@@ -44,13 +40,12 @@ resource "random_id" "adminpassword" {
 }
 
 locals {
-  icppassword    = "${var.icpadmin_password != "" ? "${var.icpadmin_password}" : "P${random_id.adminpassword.hex}"}!p"
+
+  icppassword    = "${var.icpadmin_password != "" ? "${var.icpadmin_password}" : "P${random_id.adminpassword.hex}"}@p"
 
   # This is just to have a long list of disabled items to use in icp-deploy.tf
   disabled_list = "${list("disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled","disabled")}"
 
   disabled_management_services = "${zipmap(var.disabled_management_services, slice(local.disabled_list, 0, length(var.disabled_management_services)))}"
-
-  is_311 = "${replace(var.icp_inception_image, "3.1.1", "") != var.icp_inception_image ? "true" : "false"}"
 
 }

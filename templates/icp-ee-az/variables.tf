@@ -111,7 +111,7 @@ variable "icpadmin_password" {
 }
 variable "icp_inception_image" {
     description = "ICP Inception image to use"
-    default = "ibmcom/icp-inception-amd64:3.1.1-ee"
+    default = "ibmcom/icp-inception-amd64:3.2.0-ee"
 }
 variable "cluster_name" {
   description = "Deployment name for resources prefix"
@@ -126,9 +126,9 @@ variable "boot" {
   default = {
     nodes         = "1"
     name          = "bootnode"
-    vm_size       = "Standard_A2_v2"
+    vm_size       = "Standard_A8_v2"
     os_disk_type  = "Standard_LRS"
-    os_disk_size  = "100"
+    os_disk_size  = "200"
     docker_disk_size = "100"
     docker_disk_type = "StandardSSD_LRS"
   }
@@ -154,7 +154,7 @@ variable "proxy" {
   default = {
     nodes         = "3"
     name          = "proxy"
-    vm_size       = "Standard_A2_v2"
+    vm_size       = "Standard_A4_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "150"        
     docker_disk_size = "100"
@@ -166,7 +166,6 @@ variable "management" {
   default = {
     nodes         = "3"
     name          = "mgmt"
-    #vm_size      = "Standard_A4_v2"
     vm_size       = "Standard_A8_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size  = "200"        
@@ -201,7 +200,7 @@ variable "va" {
 variable "master_lb_ports" {
   description = "Ports on the master load balancer to listen to"
   type        = "list"
-  default     = ["8443", "8001", "8500", "8600", "4300", "9443"]
+  default     = ["8443", "8001", "8500", "8600", "4300", "9443", "445"]
 }
 
 variable "proxy_lb_ports" {

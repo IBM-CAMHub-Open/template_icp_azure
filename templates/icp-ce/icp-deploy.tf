@@ -1,5 +1,5 @@
 ##################################
-## This module handles all the ICP confifguration
+## This module handles all the ICP configuration
 ## and prerequisites setup
 ##################################
 
@@ -9,13 +9,19 @@ data "azurerm_client_config" "client_config" {}
 
 module "icpprovision" {
   source = "git::https://github.com/IBM-CAMHub-Open/template_icp_modules.git?ref=2.3//public_cloud"
-
+ 
   bastion_host = "${element(concat(azurerm_public_ip.bootnode_pip.*.ip_address, azurerm_public_ip.master_pip.*.ip_address), 0)}"
 
   # Provide IP addresses for boot, master, mgmt, va, proxy and workers
   boot-node = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, azurerm_network_interface.master_nic.*.private_ip_address), 0)}"
 
   ssh_agent = false
+
+  #in support of version upgrade
+  icp-version-upgrade = "${var.icp_version}"
+  
+  #in support of workers scaling
+  icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
   
   icp-host-groups = {
     master      = ["${azurerm_network_interface.master_nic.*.private_ip_address}"]
@@ -25,6 +31,7 @@ module "icpprovision" {
   }
 
   icp-version = "${var.icp_version}"
+  icp_config_file = "${path.module}/scripts/config.yaml"
 
   # Workaround for terraform issue #10857
   # When this is fixed, we can work this out autmatically
@@ -41,8 +48,8 @@ module "icpprovision" {
     "proxy_lb_address"          = "${element(azurerm_public_ip.proxy_pip.*.fqdn, 0)}"
     "cluster_CA_domain"         = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
     "cluster_name"              = "${var.cluster_name}"
-    #"docker_username"           = "admin"
-    #"docker_password"           = "${local.icppassword}"
+    "docker_username"           = "admin"
+    "docker_password"           = "${local.icppassword}"
 
     # RHEL requires firewall enabled flag
     "firewall_enabled"          = "true"
@@ -55,7 +62,7 @@ module "icpprovision" {
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
     "kubelet_nodename"          = "nodename"
-    "cloud_provider"            = "azure"
+    #"cloud_provider"            = "azure"
 
     # If you want to use calico in policy only mode and Azure routed routes.
     "kube_controller_manager_extra_args" = ["--allocate-node-cidrs=true"]
@@ -63,7 +70,8 @@ module "icpprovision" {
 
     # Azure specific configurations
     # We don't need ip in ip with Azure networking
-    "calico_ipip_enabled"       = "false"
+    "calico_ipip_mode" 			 = "Always"    
+    #"calico_ipip_enabled"       = "false"
     "calico_networking_backend" = "none"
     "calico_ipam_type"          = "host-local"
     "calico_ipam_subnet"        = "usePodCidr"

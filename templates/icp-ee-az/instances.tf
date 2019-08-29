@@ -43,7 +43,7 @@
 ##################################
 resource "azurerm_virtual_machine" "boot" {
   count                 = "${var.boot["nodes"]}"
-  name                  = "${var.boot["name"]}${count.index + 1}"
+  name                  = "${var.boot["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.boot["vm_size"]}"
@@ -63,7 +63,7 @@ resource "azurerm_virtual_machine" "boot" {
   }
 
   storage_os_disk {
-    name              = "${var.boot["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.boot["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.boot["os_disk_type"]}"
     disk_size_gb      = "${var.boot["os_disk_size"]}"
     caching           = "ReadWrite"
@@ -71,7 +71,7 @@ resource "azurerm_virtual_machine" "boot" {
   }
 
   storage_data_disk {
-    name              = "${var.boot["name"]}-dockerdisk-${count.index + 1}"
+    name              = "${var.boot["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
     managed_disk_type = "${var.boot["docker_disk_type"]}"
     disk_size_gb      = "${var.boot["docker_disk_size"]}"
     caching           = "ReadWrite"
@@ -80,7 +80,7 @@ resource "azurerm_virtual_machine" "boot" {
   }
 
   os_profile {
-    computer_name  = "${var.boot["name"]}${count.index + 1}"
+    computer_name  = "${var.boot["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.bootconfig.rendered}"
   }
@@ -100,7 +100,7 @@ resource "azurerm_virtual_machine" "boot" {
 ##################################
 resource "azurerm_virtual_machine" "master" {
   count                 = "${var.master["nodes"]}"
-  name                  = "${var.master["name"]}${count.index + 1}"
+  name                  = "${var.master["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.master["vm_size"]}"
@@ -122,7 +122,7 @@ resource "azurerm_virtual_machine" "master" {
   }
 
   storage_os_disk {
-    name              = "${var.master["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.master["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.master["os_disk_type"]}"
     disk_size_gb      = "${var.master["os_disk_size"]}"
     caching           = "ReadWrite"
@@ -131,7 +131,7 @@ resource "azurerm_virtual_machine" "master" {
 
   # Docker disk
   storage_data_disk {
-    name              = "${var.master["name"]}-dockerdisk-${count.index + 1}"
+    name              = "${var.master["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
     managed_disk_type = "${var.master["docker_disk_type"]}"
     disk_size_gb      = "${var.master["docker_disk_size"]}"
     caching           = "ReadWrite"
@@ -160,7 +160,7 @@ resource "azurerm_virtual_machine" "master" {
   }
 
   os_profile {
-    computer_name  = "${var.master["name"]}${count.index + 1}"
+    computer_name  = "${var.master["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.masterconfig.rendered}"
   }
@@ -180,7 +180,7 @@ resource "azurerm_virtual_machine" "master" {
 ##################################
 resource "azurerm_virtual_machine" "proxy" {
   count                 = "${var.proxy["nodes"]}"
-  name                  = "${var.proxy["name"]}${count.index + 1}"
+  name                  = "${var.proxy["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.proxy["vm_size"]}"
@@ -202,7 +202,7 @@ resource "azurerm_virtual_machine" "proxy" {
   }
 
   storage_os_disk {
-    name              = "${var.proxy["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.proxy["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.proxy["os_disk_type"]}"
     disk_size_gb      = "${var.proxy["os_disk_size"]}"    
     caching           = "ReadWrite"
@@ -210,7 +210,7 @@ resource "azurerm_virtual_machine" "proxy" {
   }
 
    storage_data_disk {
-     name              = "${var.proxy["name"]}-dockerdisk-${count.index + 1}"
+     name              = "${var.proxy["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
      managed_disk_type = "${var.proxy["docker_disk_type"]}"
      disk_size_gb      = "${var.proxy["docker_disk_size"]}"
      caching           = "ReadWrite"
@@ -219,7 +219,7 @@ resource "azurerm_virtual_machine" "proxy" {
    }
 
   os_profile {
-    computer_name  = "${var.proxy["name"]}${count.index + 1}"
+    computer_name  = "${var.proxy["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.proxyconfig.rendered}"
   }
@@ -238,7 +238,7 @@ resource "azurerm_virtual_machine" "proxy" {
 ##################################
 resource "azurerm_virtual_machine" "management" {
   count                 = "${var.management["nodes"]}"
-  name                  = "${var.management["name"]}${count.index + 1}"
+  name                  = "${var.management["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.management["vm_size"]}"
@@ -260,7 +260,7 @@ resource "azurerm_virtual_machine" "management" {
   }
 
   storage_os_disk {
-    name              = "${var.management["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.management["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.management["os_disk_type"]}"
     disk_size_gb      = "${var.management["os_disk_size"]}"    
     caching           = "ReadWrite"
@@ -268,7 +268,7 @@ resource "azurerm_virtual_machine" "management" {
   }
 
    storage_data_disk {
-     name              = "${var.management["name"]}-dockerdisk-${count.index + 1}"
+     name              = "${var.management["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
      managed_disk_type = "${var.management["docker_disk_type"]}"
      disk_size_gb      = "${var.management["docker_disk_size"]}"
      caching           = "ReadWrite"
@@ -277,7 +277,7 @@ resource "azurerm_virtual_machine" "management" {
    }
 
   os_profile {
-    computer_name  = "${var.management["name"]}${count.index + 1}"
+    computer_name  = "${var.management["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.mgmtconfig.rendered}"
   }
@@ -297,7 +297,7 @@ resource "azurerm_virtual_machine" "management" {
 ##################################
 resource "azurerm_virtual_machine" "worker" {
   count                 = "${var.worker["nodes"]}"
-  name                  = "${var.worker["name"]}${count.index + 1}"
+  name                  = "${var.worker["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.worker["vm_size"]}"
@@ -319,7 +319,7 @@ resource "azurerm_virtual_machine" "worker" {
   }
 
   storage_os_disk {
-    name              = "${var.worker["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.worker["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.worker["os_disk_type"]}"
     disk_size_gb      = "${var.worker["os_disk_size"]}"    
     caching           = "ReadWrite"
@@ -327,7 +327,7 @@ resource "azurerm_virtual_machine" "worker" {
   }
 
    storage_data_disk {
-     name              = "${var.worker["name"]}-dockerdisk-${count.index + 1}"
+     name              = "${var.worker["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
      managed_disk_type = "${var.worker["docker_disk_type"]}"
      disk_size_gb      = "${var.worker["docker_disk_size"]}"
      caching           = "ReadWrite"
@@ -336,7 +336,7 @@ resource "azurerm_virtual_machine" "worker" {
    }
 
   os_profile {
-    computer_name  = "${var.worker["name"]}${count.index + 1}"
+    computer_name  = "${var.worker["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.workerconfig.rendered}"
   }
@@ -355,7 +355,7 @@ resource "azurerm_virtual_machine" "worker" {
 ##################################
 resource "azurerm_virtual_machine" "va" {
   count                 = "${var.va["nodes"]}"
-  name                  = "${var.va["name"]}${count.index + 1}"
+  name                  = "${var.va["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
   location              = "${var.location}"
   resource_group_name   = "${azurerm_resource_group.icp.name}"
   vm_size               = "${var.va["vm_size"]}"
@@ -376,7 +376,7 @@ resource "azurerm_virtual_machine" "va" {
   }
 
   storage_os_disk {
-    name              = "${var.va["name"]}-osdisk-${count.index + 1}"
+    name              = "${var.va["name"]}-${random_id.clusterid.hex}-osdisk-${count.index + 1}"
     managed_disk_type = "${var.va["os_disk_type"]}"
     disk_size_gb      = "${var.va["os_disk_size"]}"    
     caching           = "ReadWrite"
@@ -384,7 +384,7 @@ resource "azurerm_virtual_machine" "va" {
   }
 
    storage_data_disk {
-     name              = "${var.va["name"]}-dockerdisk-${count.index + 1}"
+     name              = "${var.va["name"]}-${random_id.clusterid.hex}-dockerdisk-${count.index + 1}"
      managed_disk_type = "${var.va["docker_disk_type"]}"
      disk_size_gb      = "${var.va["docker_disk_size"]}"
      caching           = "ReadWrite"
@@ -393,7 +393,7 @@ resource "azurerm_virtual_machine" "va" {
    }
 
   os_profile {
-    computer_name  = "${var.va["name"]}${count.index + 1}"
+    computer_name  = "${var.va["name"]}-${random_id.clusterid.hex}-${count.index + 1}"
     admin_username = "${var.admin_username}"
     custom_data    = "${data.template_cloudinit_config.vaconfig.rendered}"
   }

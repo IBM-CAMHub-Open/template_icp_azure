@@ -36,7 +36,11 @@ output "ibm_cloud_private_boot_ip" {
 }
 
 output "ibm_cloud_private_master_ip" {
-  value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
+  value = "${element(azurerm_public_ip.master_pip.*.ip_address, 0)}"
+}
+
+output "icp_klusterlet_dns" {
+  value = "${element(azurerm_public_ip.proxy_pip.*.fqdn, 0)}"
 }
 
 output "ibm_cloud_private_ssh_user" {
