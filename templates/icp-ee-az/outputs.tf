@@ -19,6 +19,10 @@ output "ibm_cloud_private_cluster_name" {
   value = "${var.cluster_name}"
 }
 
+output "ibm_cloud_private_registry_server" {
+  value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
+}
+
 output "ibm_cloud_private_cluster_CA_domain_name" {
   value = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
 }
@@ -49,4 +53,12 @@ output "ibm_cloud_private_ssh_key" {
 
 output "connection_name" {
 	value = "${var.cluster_name}${random_id.clusterid.hex}"
+}
+
+output "Filestore for registry and audit" {
+  value = "${element(split(":", azurerm_storage_share.icpregistry.url), 1)}"
+}
+
+output "icp_klusterlet_dns" {
+  value = "${azurerm_public_ip.klusterlet_pip.fqdn}"
 }

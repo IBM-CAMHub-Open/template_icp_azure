@@ -55,6 +55,15 @@ resource "azurerm_public_ip" "proxy_pip" {
   domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-ingress"
 }
 
+resource "azurerm_public_ip" "klusterlet_pip" {
+  name                         = "${var.cluster_name}-${random_id.clusterid.hex}-ksingress"
+  location                     = "${var.location}"
+  resource_group_name          = "${azurerm_resource_group.icp.name}"
+  allocation_method = "Static"
+  sku                          = "Standard"
+  domain_name_label            = "${var.cluster_name}-${random_id.clusterid.hex}-ksingress"
+}
+
 resource "azurerm_public_ip" "bootnode_pip" {
   name                         = "${var.cluster_name}-${random_id.clusterid.hex}-bootnode"
   location                     = "${var.location}"

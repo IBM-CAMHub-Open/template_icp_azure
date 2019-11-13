@@ -1,4 +1,5 @@
 {  
+ "terraform_engine": "~> 0.11.0",
  "input_datatypes": [
     {
       "name": "bastionhost",
@@ -21,10 +22,31 @@
           },
           {
             "name": "ICP_server",
-            "value": "${template_output_params.ibm_cloud_private_master_ip}"
+            "value": "${template_output_params.ibm_cloud_private_cluster_CA_domain_name}"
           }
         ]
       }
+    },
+    {
+      "name": "private_docker_registry",
+      "dataobject": {
+        "name": "${template_output_params.registry_config_do_name}",
+        "attributes": [
+          {
+            "name": "server_name",
+            "value": "${template_output_params.ibm_cloud_private_cluster_CA_domain_name}"
+          }, {
+            "name": "server_ip",
+            "value": "${template_output_params.ibm_cloud_private_master_ip}"
+          }, {
+            "name": "server_port",
+            "value": "8500"
+          }, {
+            "name": "CA_certificate",
+            "value": "${template_output_params.registry_ca_cert}"
+          }
+        ]
+      }     
     }
   ],      
     
@@ -32,51 +54,49 @@
     {
       "name": "bastion",
       "label": "Bastion host variables"
-    }
-  ],
-    "input_groups": [
-      {
-        "name": "cloud",
-        "label": "Cloud Input Variables"
-      },
-      {
-        "name": "icpdownload",
-        "label": "IBM Cloud Private Download Settings"
-      },
-      {
-        "name": "generalvmtemplate",
-        "label": "IBM Cloud Private VM Settings"
-      },  
-      {
-        "name": "generalvmtemplatenet",
-        "label": "IBM Cloud Private Network Settings"
-      },      
-          
-      {
-        "name": "bootvirtualmachine",
-        "label": "Boot Node Input Settings"
-      },
-      {
-        "name": "mastervirtualmachine",
-        "label": "Master Nodes Input Settings"
-      },
-      {
-        "name": "proxyvirtualmachine",
-        "label": "Proxy Nodes Input Settings"
-      },
-      {
-        "name": "workervirtualmachine",
-        "label": "Worker Nodes Input Settings"
-      },
-      {
-        "name": "mgmtvirtualmachine",
-        "label": "Management Node Input Settings"
-      },      
-      {
-        "name": "vavirtualmachine",
-        "label": "Vulnerability Advisor Node Input Settings"
-      }      
-    ], 
+    },
+    {
+      "name": "cloud",
+      "label": "Cloud Input Variables"
+    },
+    {
+      "name": "icpdownload",
+      "label": "IBM Cloud Private Download Settings"
+    },
+    {
+      "name": "generalvmtemplate",
+      "label": "IBM Cloud Private VM Settings"
+    },  
+    {
+      "name": "generalvmtemplatenet",
+      "label": "IBM Cloud Private Network Settings"
+    },      
+        
+    {
+      "name": "bootvirtualmachine",
+      "label": "Boot Node Input Settings"
+    },
+    {
+      "name": "mastervirtualmachine",
+      "label": "Master Nodes Input Settings"
+    },
+    {
+      "name": "proxyvirtualmachine",
+      "label": "Proxy Nodes Input Settings"
+    },
+    {
+      "name": "workervirtualmachine",
+      "label": "Worker Nodes Input Settings"
+    },
+    {
+      "name": "mgmtvirtualmachine",
+      "label": "Management Node Input Settings"
+    },      
+    {
+      "name": "vavirtualmachine",
+      "label": "Vulnerability Advisor Node Input Settings"
+    }      
+  ], 
 	"output_groups": [{
 		"name": "content_template_output",
 		"label": "Outputs"
@@ -374,10 +394,10 @@
       "default": {
         "nodes": "1",
         "name" : "master",
-        "vm_size" : "Standard_A8_v2",
-    	"os_disk_size"  : "300",               
+        "vm_size" : "Standard_D8_v3",
+    	"os_disk_size"  : "800",               
         "os_disk_type": "Standard_LRS",
-        "docker_disk_size": "100",
+        "docker_disk_size": "150",
         "docker_disk_type": "Standard_LRS",
 	    "etcd_data_size" : "10",
 	    "etcd_data_type" : "StandardSSD_LRS",
@@ -399,10 +419,10 @@
       "default": {
         "nodes": "1",
         "name" : "proxy",
-        "vm_size" : "Standard_A4_v2",
-    	"os_disk_size"  : "150",                       
+        "vm_size" : "Standard_D4_v3",
+    	"os_disk_size"  : "350",                       
         "os_disk_type": "Standard_LRS",
-        "docker_disk_size": "100",
+        "docker_disk_size": "150",
         "docker_disk_type": "Standard_LRS"        
       },
       "description": "Proxy Node vm settings. If set to 0, the master node becomes proxy too.",
@@ -419,10 +439,10 @@
       "default": {
         "nodes": "1",
         "name" : "worker",
-        "vm_size" : "Standard_A4_v2",
-    	"os_disk_size"  : "150",                       
+        "vm_size" : "Standard_D8_v3",
+    	"os_disk_size"  : "350",                       
         "os_disk_type": "Standard_LRS",
-        "docker_disk_size": "100",
+        "docker_disk_size": "150",
         "docker_disk_type": "Standard_LRS"        
       },
       "description": "Worker Node vm settings.If set to 0, the master node becomes worker too.",
@@ -439,10 +459,10 @@
       "default": {
         "nodes": "1",      
         "name" : "mgmt",
-        "vm_size" : "Standard_A8_v2",
-    	"os_disk_size"  : "250",               
+        "vm_size" : "Standard_D8_v3",
+    	"os_disk_size"  : "300",               
         "os_disk_type": "Standard_LRS",
-        "docker_disk_size": "100",
+        "docker_disk_size": "150",
         "docker_disk_type": "Standard_LRS"        
       },
       "description": "Management Node vm settings. If the node value is 0, the master node will be set as a management node.",
@@ -459,10 +479,10 @@
       "default": {
         "nodes": "1",
         "name" : "va",
-        "vm_size" : "Standard_A8_v2",
-    	"os_disk_size"  : "400",           
+        "vm_size" : "Standard_D8_v3",
+    	"os_disk_size"  : "800",           
         "os_disk_type": "Standard_LRS",
-        "docker_disk_size": "100",                   	            
+        "docker_disk_size": "150",                   	            
         "docker_disk_type": "Standard_LRS"
       },
       "description": "VA Node vm settings",
@@ -500,8 +520,8 @@
     },
     {
       "name": "disabled_management_services",
-      "description": "List of disabled management services",
-      "default" : ["istio", "vulnerability-advisor", "storage-glusterfs", "storage-minio", "metrics-server", "custom-metrics-adapter", "image-security-enforcement", "metering", "monitoring", "logging", "audit-logging"],
+      "description": "List of disabled management services.",
+      "default" : ["istio", "vulnerability-advisor", "storage-glusterfs", "storage-minio","logging", "audit-logging"],
       "type": "list",
       "required": true,
       "secured": false,
@@ -571,7 +591,7 @@
     {
     "name": "icp_inception_image",
     "description": "IBM Cloud Private Version Number",
-    "default" : "ibmcom/icp-inception-amd64:3.1.1-ee",
+    "default" : "ibmcom/icp-inception-amd64:3.2.1-ee",
     "type": "string",
     "required": false,
     "secured": false,
@@ -651,7 +671,27 @@
       "hidden": false,
       "immutable": false,
       "group_name": "content_template_output"
-    },                              
+    },
+    {
+      "name": "ibm_cloud_private_registry_server",
+      "description": "IBM Cloud Private Registry Server",
+      "type": "string",
+      "required": true,
+      "secured": false,
+      "label": "ICP Registry Server",
+      "hidden": false,
+      "immutable": false
+	},
+    {
+      "name": "icp_klusterlet_dns",
+      "label": "Host Name for klusterlet Prometheus ingress rule",
+      "description": "Use this host name as input to the klusterlet Prometheus ingress hostname.",
+      "group_name": "",
+      "secured": false,
+      "hidden": false,
+      "shortname": "",
+      "type": "string"
+    },             	                                      
     {
       "name": "ibm_cloud_private_admin_user",
       "description": "IBM Cloud Private Admin Username",
@@ -706,7 +746,31 @@
       "hidden": false,
       "immutable": false,
       "group_name": "content_template_output"
-    }     
+    },
+    {
+      "name": "icp_install_dir",
+      "type": "string",
+      "description": "ICP Install Directory",
+      "hidden": false,
+      "label": "ICP Install Directory",
+      "secured": false
+    },    
+      {
+      "name": "registry_ca_cert",
+      "type": "string",
+      "description": "Base64 encoded private docker registry CA certificate. If CA certificate is emmpty then this value will be base64 encoded value of string NIL",
+      "hidden": false,
+      "label": "Base64 encoded private docker registry CA certificate",
+      "secured": false
+    },
+    {
+      "name": "registry_config_do_name",
+      "type": "string",
+      "description": "Name of docker private registry data object that contains docker registry details for this deployment.",
+      "hidden": false,
+      "label": "Docker Private Registry Data Object Name",
+      "secured": false
+    }         
 
   ]
 

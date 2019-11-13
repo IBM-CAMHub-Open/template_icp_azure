@@ -7,7 +7,7 @@ Copyright IBM Corp. 2019, 2019
 These Terraform example templates uses the Terraform AzureRM Provider to provision servers in Azure and [Terraform Module ICP Deploy](https://github.com/ibm-cloud-architecture/terraform-module-icp-deploy) to deploy IBM Cloud Private on them.
 
 
-## Pre-requisits
+## Pre-requisites
 - Basic understanding of [IBM Cloud Private](https://www.ibm.com/cloud/private)
 - Azure account
 - Access to ICP Images tarball if deploying ICP Enterprise Edition templates
@@ -21,7 +21,7 @@ Each template example provided is highly customizable, but are all configured wi
 
 1. [templates/icp-ce](templates/icp-ce)
 
-   Basic template which deploys a single master node on an azure VM. Both Maser and Proxy are assigned public IP addresses so they can be easily accessed over the internet. IBM Cloud Private Community Edition is installed directly from Docker Hub, so this template does not require access to ICP Enterprise Edition licenses and Image tarball.
+   Basic template which deploys a single master node on an Azure VM. Both Master and Proxy are assigned public IP addresses so they can be easily accessed over the internet. IBM Cloud Private Community Edition is installed directly from Docker Hub, so this template does not require access to ICP Enterprise Edition licenses and Image tarball.
    Suitable for initial tests and validations.
 
 2. [templates/icp-ee-az](templates/icp-ee-az)
@@ -51,7 +51,7 @@ cloudctl = cloudctl login --skip-ssl-validation -a https://hktestas-f4c95db9-con
 
 You can use `cloudctl` to configure your local `kubectl` and `helm` command line client to use this environments, and access the Web Console with the provided username and password
 
-For instructions on how to install cloudctl go to the IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.1/manage_cluster/install_cli.html)
+For instructions on how to install cloudctl go to the IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.2.1/manage_cluster/install_cli.html)
 
 ## Using integrated Azure functionality
 
@@ -68,7 +68,7 @@ To expose an application with Azure Load balancer, follow these steps
    kubectl run mynginx --image=nginx --replicas=2 --port=80
    ```
    Note: If you get a imagepolicy error you'll need to whitelist images from docker hub
-   See IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.1.1/manage_images/image_security.html) for information on how to do this
+   See IBM [KnowledgeCenter](https://www.ibm.com/support/knowledgecenter/SSBS6K_3.2.1/manage_images/image_security.html) for information on how to do this
 2. Expose the deployment with type LoadBalancer
     ```
     kubectl expose deployment mynginx --port=80 --type=LoadBalancer

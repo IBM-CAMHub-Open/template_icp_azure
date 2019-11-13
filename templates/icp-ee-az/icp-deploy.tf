@@ -1,5 +1,5 @@
 ##################################
-## This module handles all the ICP confifguration
+## This module handles all the ICP configuration
 ## and prerequisites setup
 ##################################
 
@@ -9,8 +9,8 @@ data "azurerm_client_config" "client_config" {}
 
 locals {
 
-  docker_username = "${var.registry_username != "" ? var.registry_username : "admin"}"
-  docker_password = "${var.registry_password != "" ? var.registry_password : "${local.icppassword}"}"
+  docker_username = "${var.registry_username}"
+  docker_password = "${var.registry_password}"
 
   # Intermediate interpolations
   credentials = "${var.registry_username != "" ? join(":", list("${var.registry_username}"), list("${var.registry_password}")) : ""}"
@@ -19,19 +19,52 @@ locals {
   # Inception image formatted for ICP deploy module
   inception_image = "${local.cred_reg != "" ? join("/", list("${local.cred_reg}"), list("${var.icp_inception_image}")) : var.icp_inception_image}"
 
+  registry_server = "${element(azurerm_public_ip.master_pip.*.fqdn, 0)}"
 }
 
-module "icpprovision" {
-  source = "git::https://github.com/IBM-CAMHub-Open/template_icp_modules.git?ref=2.3//public_cloud"
+resource "null_resource" "image_copy" {
+
+  triggers {
+    imagelocation = "${var.image_location}"
+  }
+
+  connection {
+
+    host     = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, list("")), 0)}"
+    bastion_host  = "${azurerm_public_ip.bootnode_pip.ip_address}"
+
+    user          = "${var.admin_username}"
+    private_key   = "${tls_private_key.vmkey.private_key_pem}"
+  }  
+  provisioner "remote-exec" {
+
+    # We need to wait for cloud init to finish it's boot sequence.
+    inline = [
+      "if [ -d /opt/ibm/cluster ] && [ ! -z ${var.image_location} ]; then image_file=\"$(basename ${var.image_location})\"; azcopy --source ${var.image_location} --source-key ${var.image_location_key} --destination /tmp/$image_file; fi"
+    ]
+  }  
+}
+
+module "icp_provision" {
+  source = "git::https://github.com/IBM-CAMHub-Open/template_icp_modules.git?ref=3.2.1//public_cloud"
 
   bastion_host = "${azurerm_public_ip.bootnode_pip.ip_address}"
-  
+
+  #image_load_finished = "${module.image_load.image_load_finished}"
+  image_load_finished = true
   ssh_agent = false
   install-verbosity = "${var.install_verbosity != "" ? "${var.install_verbosity}" : ""}"
 
   # Provide IP addresses for boot, master, mgmt, va, proxy and workers
   boot-node = "${element(concat(azurerm_network_interface.boot_nic.*.private_ip_address, list("")), 0)}"
 
+  #in support of version upgrade
+  icp-version-upgrade = "${var.icp_inception_image}"
+  image-location-upgrade = "${var.image_location}"
+
+  #in support of workers scaling
+  icp-worker = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
+  
   icp-host-groups = {
     master      = ["${azurerm_network_interface.master_nic.*.private_ip_address}"]
     worker      = ["${azurerm_network_interface.worker_nic.*.private_ip_address}"]
@@ -41,7 +74,9 @@ module "icpprovision" {
     
   }
 
-  icp-version = "${local.inception_image}"  
+  icp-version = "${local.inception_image}"
+  icp_config_file = "${path.module}/scripts/config.yaml"
+
   #image file set if the binaries are loaded from Azure container
   image_file = "${var.image_location != "" ? "/opt/ibm/cluster/images/${basename(var.image_location)}" : "/dev/null" }"
   #docker image file set if the binaries are loaded from Azure container  
@@ -62,11 +97,8 @@ module "icpprovision" {
     "cluster_CA_domain"         = "${azurerm_public_ip.master_pip.fqdn}"
     "cluster_name"              = "${var.cluster_name}"
 
-    "private_registry_enabled"  = "${var.private_registry != "" ? "true" : "false"}"
-    # "private_registry_server"   = "${var.private_registry}"
-    "image_repo"                = "${var.private_registry != "" ? "${var.private_registry}/${dirname(var.icp_inception_image)}" : ""}"
-    "docker_username"           = "${local.docker_username}"
-    "docker_password"           = "${local.docker_password}"
+	  "docker_username"                 = "${local.docker_username}" # Will either be empty string or supplied by user for private registries
+	  "docker_password"                 = "${local.docker_password}" # Will either be empty string or supplied by user for private registries
 
     # An admin password will be generated if not supplied in terraform.tfvars
     "default_admin_password"          = "${local.icppassword}"
@@ -75,7 +107,7 @@ module "icpprovision" {
     "management_services"             = "${local.disabled_management_services}"
 
     "calico_ip_autodetection_method" = "can-reach=${azurerm_network_interface.master_nic.0.private_ip_address}"
-    "kubelet_nodename"          = "fqdn"
+    "kubelet_nodename"          = "nodename"
 
     #"cloud_provider"            = "azure"
 
@@ -131,13 +163,15 @@ module "icpprovision" {
   generate_key = true
 
   ssh_user         = "${var.admin_username}"
-  ssh_key_base64   = "${base64encode(tls_private_key.installkey.private_key_pem)}"
+  ssh_key_base64   = "${base64encode(tls_private_key.vmkey.private_key_pem)}"
 
     # Make sure to wait for image load to complete
-    hooks = {
+  hooks = {
       "boot-preconfig" = [
         "while [ ! -f /opt/ibm/.imageload_complete ]; do sleep 5; done"
       ]
+       "postinstall" = [
+         "/opt/ibm/scripts/copy_certif.sh"
+       ]             
     }
-
 }
