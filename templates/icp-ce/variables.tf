@@ -175,7 +175,7 @@ variable "worker" {
   default = {
     nodes         = "2"
     name          = "worker"
-    vm_size       = "Standard_A4_v2"
+    vm_size       = "Standard_A8_v2"
     os_disk_type  = "Standard_LRS"
     os_disk_size = "150"        
     docker_disk_size = "100"
