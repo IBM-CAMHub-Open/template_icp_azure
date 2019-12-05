@@ -78,40 +78,40 @@ module "icp_provision" {
     "calico_ipam_type"          = "host-local"
     "calico_ipam_subnet"        = "usePodCidr"
 
-    "azure"                  = {
+    #"azure"                  = {
       # Common authantication details for both kubelet and controller manager
-      "cloud_provider_conf" = {
-          "cloud"               = "AzurePublicCloud"
-          "useInstanceMetadata" = "true"
-          "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
-          "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
-          "resourceGroup"       = "${azurerm_resource_group.icp.name}"
-          "useManagedIdentityExtension" = "true"
-      }
+    #  "cloud_provider_conf" = {
+    #      "cloud"               = "AzurePublicCloud"
+    #      "useInstanceMetadata" = "true"
+    #      "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
+    #      "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
+    #      "resourceGroup"       = "${azurerm_resource_group.icp.name}"
+    #      "useManagedIdentityExtension" = "true"
+    #  }
       # Authentication information specific for controller
       ## Controller will need additional permissions as it needs to create routes in the router table,
       ## interact with storage and networking resources
-      "cloud_provider_controller_conf" = {
-          "cloud"               = "AzurePublicCloud"
-          "useInstanceMetadata" = "true"
-          "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
-          "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
-          "resourceGroup"       = "${azurerm_resource_group.icp.name}"
-          "aadClientId"         = "${var.aadClientId}"
-          "aadClientSecret"     = "${var.aadClientSecret}"
-          "location"            = "${azurerm_resource_group.icp.location}"
-          "subnetName"          = "${azurerm_subnet.container_subnet.name}"
-          "vnetName"            = "${azurerm_virtual_network.icp_vnet.name}"
-          "vnetResourceGroup"   = "${azurerm_resource_group.icp.name}"
-          "routeTableName"      = "${azurerm_route_table.routetb.name}"
-          "cloudProviderBackoff"        = "false"
-          "loadBalancerSku"             = "Standard"
-          "primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
-          "securityGroupName"           = "${azurerm_network_security_group.worker_sg.name}"# "hktest-worker-sg"
-          "excludeMasterFromStandardLB" = "true"
-          "useManagedIdentityExtension" = "false"
-      }
-    }
+    #  "cloud_provider_controller_conf" = {
+    #      "cloud"               = "AzurePublicCloud"
+    #      "useInstanceMetadata" = "true"
+    #      "tenantId"            = "${data.azurerm_client_config.client_config.tenant_id}"
+    #      "subscriptionId"      = "${data.azurerm_client_config.client_config.subscription_id}"
+    #      "resourceGroup"       = "${azurerm_resource_group.icp.name}"
+    #      "aadClientId"         = "${var.aadClientId}"
+    #      "aadClientSecret"     = "${var.aadClientSecret}"
+    #      "location"            = "${azurerm_resource_group.icp.location}"
+    #      "subnetName"          = "${azurerm_subnet.container_subnet.name}"
+    #      "vnetName"            = "${azurerm_virtual_network.icp_vnet.name}"
+    #      "vnetResourceGroup"   = "${azurerm_resource_group.icp.name}"
+    #      "routeTableName"      = "${azurerm_route_table.routetb.name}"
+    #      "cloudProviderBackoff"        = "false"
+    #      "loadBalancerSku"             = "Standard"
+    #      "primaryAvailabilitySetName"  = "${basename(element(azurerm_virtual_machine.worker.*.availability_set_id, 0))}"# "workers_availabilityset"
+    #      "securityGroupName"           = "${azurerm_network_security_group.worker_sg.name}"# "hktest-worker-sg"
+    #      "excludeMasterFromStandardLB" = "true"
+    #      "useManagedIdentityExtension" = "false"
+    #  }
+    #}
 
     # We'll insert a dummy value here to create an implicit dependency on VMs in Terraform
     "dummy_waitfor" = "${length(concat(azurerm_virtual_machine.master.*.id, azurerm_virtual_machine.worker.*.id, azurerm_virtual_machine.management.*.id))}"
