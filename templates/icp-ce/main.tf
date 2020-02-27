@@ -3,7 +3,7 @@
 ##################################
 # Details about authentication options here: https://www.terraform.io/docs/providers/azurerm
 
-provider "azurerm" { }
+provider "azurerm" { version = "~> 1.0" }
 
 
 
